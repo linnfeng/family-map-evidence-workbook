@@ -1,0 +1,94 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy static content to Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Generate reviewed static workbook
+        shell: bash
+        run: |
+          mkdir -p generated_site
+          cat > generated_site/index.html <<'GENOGRAM_REVIEW_HTML'
+          <!doctype html>
+          <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A fictional, source-first workbook for reviewing the meaning, uncertainty and reading copies of a family relationship map."><title>A Source-to-Symbol Genogram Review Workbook</title><style>:root{color-scheme:light;--ink:#19323a;--accent:#20675b;--paper:#f6f9f7}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:18px/1.7 system-ui,sans-serif}header,main,footer{max-width:850px;margin:auto;padding:2rem 1.5rem}header{padding-top:3.5rem}h1{font-size:clamp(2rem,5vw,3.3rem);line-height:1.14;letter-spacing:-.03em}h2{line-height:1.25;margin-top:2.6rem}p{max-width:72ch}a{color:#155a4e;text-underline-offset:.18em}.eyebrow{font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem}.notice,figure{background:white;border:1px solid #c4d6ce;border-radius:14px;padding:1.3rem;margin:1.4rem 0}.notice{border-left:6px solid var(--accent)}figcaption{font-size:.9rem}svg{display:block;width:100%;height:auto}footer{border-top:1px solid #c4d6ce;font-size:.9rem}@media print{body{background:white;font-size:11pt}header,main,footer{padding:1rem}h2,figure{break-inside:avoid}a{color:inherit}}</style></head><body>
+          <header><div class="eyebrow">Fictional teaching workbook · Revision 1</div><h1>A Source-to-Symbol Genogram Review Workbook</h1><p>A small exercise for keeping supplied statements, visual choices and unanswered questions distinguishable.</p><div class="notice"><p>This workbook is prepared on behalf of the Genogram Maker project with autonomous AI assistance. It is not an independent product review, a report about real participants or medical advice. All people, notes and events in the exercise are fictional. No user study, clinical validation or measured outcome is claimed.</p></div></header>
+          <main>
+          <h2>1. Establish the question before drawing</h2>
+          <p>A family relationship map becomes easier to review when its purpose is narrower than telling an entire family story. For this exercise, the question is whether a reader can distinguish a supplied parent connection, a caregiving role and an unresolved identity question. The goal is not to infer missing history, produce a diagnosis or make the largest possible diagram.</p>
+          <p>Write that purpose beside the working notes before opening an editor. Then identify what the exercise does not need: real birthdays, addresses, photographs, contact information and health histories. Keeping those details out of a fictional lesson is simpler than collecting them first and attempting to disguise a real record later. The intended audience should also be stated explicitly.</p>
+          <h2>2. Read three separate fictional cards</h2>
+          <p>Card A says that Rowan is Alex's parent. Card B says that Casey provided care for Alex during one specified fictional school term. Card C mentions a person called Alex attending an event, but supplies no evidence that this is the same Alex. Keep each card separate and clearly labeled as invented teaching material rather than combining them into a fluent narrative.</p>
+          <p>The cards support different kinds of statements. Card B does not by itself establish biological parenthood, legal authority or continuous shared residence. Card C does not establish an identity match merely because the name is the same. A useful first draft preserves those limits, even when the result looks less complete than a familiar family-tree arrangement.</p>
+          <h2>3. Make a translation sheet</h2>
+          <p>For each card, write the people mentioned, the assertion supplied and the proposed visual representation. Add a separate space for what remains unspecified. A simple reference label such as Card A helps a reviewer trace a connection without relying on the author's memory. The reference label is an organizational aid, not proof that an assertion has been independently corroborated.</p>
+          <p>Keep the source wording distinguishable from the summary. A paraphrase can accidentally strengthen a claim, for example by changing provided care into was a guardian. If the visual convention would imply more than the wording supports, choose a narrower label or leave the issue unresolved. The drawing should not become the evidence for its own interpretation.</p>
+          <figure><svg viewBox="0 0 720 250" role="img" aria-labelledby="maptitle mapdesc"><title id="maptitle">A fictional source-to-connection illustration</title><desc id="mapdesc">Rowan and Alex are connected by a line labeled Card A parent. Casey and Alex are connected by a dashed line labeled Card B care during one term. Card C identity remains unresolved.</desc><g fill="#e9f3ee" stroke="#20675b" stroke-width="2"><rect x="25" y="25" width="180" height="65" rx="12"/><rect x="280" y="150" width="160" height="65" rx="12"/><rect x="515" y="25" width="180" height="65" rx="12"/></g><g stroke="#20675b" stroke-width="3" fill="none"><path d="M115 90L315 150"/><path d="M605 90L405 150" stroke-dasharray="9 7"/></g><g fill="#19323a" font-family="system-ui,sans-serif" font-size="20" text-anchor="middle"><text x="115" y="65">Rowan</text><text x="360" y="190">Alex</text><text x="605" y="65">Casey</text></g><g fill="#19323a" font-family="system-ui,sans-serif" font-size="14"><text x="30" y="132">Card A: parent</text><text x="462" y="132">Card B: one-term care</text><text x="215" y="242">Card C: identity remains unresolved</text></g></svg><figcaption>Original fictional illustration for this workbook. These shapes and line styles are explanatory choices, not a universal genogram notation or an image exported by a product.</figcaption></figure>
+          <h2>4. Check identity before counting connections</h2>
+          <p>Build a short person list and give each intended fictional person a stable working identifier. A nickname should not silently create a duplicate node, while a shared first name should not merge two people. Card C stays separate as an unresolved identity reference until the exercise supplies an appropriate clarification. Do not invent identifying details to force a match.</p>
+          <p>A matching number of nodes is not sufficient evidence of completeness. One duplicated person and one omitted person can leave the total unchanged. Compare the correspondence between the source list and the drawing directly. Similarly, do not infer gender, a legal role, a health condition or an exact date from a name, a symbol position or a plausible generation gap.</p>
+          <h2>5. Define the conventions actually used</h2>
+          <p>A legend should explain the meaning of the current marks, not simply name their appearance. Solid, dashed and dotted connections can carry different meanings in different notations or applications. In this illustration the dashed connection refers to the explicitly labeled caregiving role. It should not be interpreted as uncertainty or a clinical judgment without a separate explanation.</p>
+          <p>Limit the key to the distinctions needed for the exercise. Unused health symbols and elaborate emotional annotations can distract from the lesson and create an appearance of authority that the source does not support. If the chosen editor cannot express a needed distinction clearly, add an ordinary text label or explain the limitation rather than selecting a visually similar but misleading convention.</p>
+          <h2>6. Keep the drafting workspace optional</h2>
+          <p>The exercise can be completed on paper. For a browser-based alternative, the <a href="https://genogrammaker.org/">genogram maker free</a> option from Genogram Maker provides editable people and relationships, contextual notes, auto layout and optional AI drafting. The current free plan describes two projects, up to fifty people per project, five monthly AI credits after sign-in and PNG export.</p>
+          <p>AI creation or updates use one to five credits. Professional access adds PDF, SVG, GEDCOM and editable JSON downloads. Check current official plans before relying on an allowance or output format. These are editing and delivery capabilities, not evidence that a relationship is true or that the service satisfies requirements for regulated records. A browser interface alone establishes neither local-only processing nor confidentiality guarantees.</p>
+          <h2>7. Give an AI draft a reviewable constraint</h2>
+          <p>If AI assists, ask it to preserve the supplied people and assertions, avoid invented dates or diagnoses, and retain unresolved items as unresolved. A useful instruction can request questions for review instead of a single reconciled family story. Such instructions create an expectation to inspect; they do not guarantee that a generated draft will obey every constraint.</p>
+          <p>Compare the result with the translation sheet. A generated explanation is not a new source for a connection, and a polished branch is not a reason to accept an unsupported relationship. Keep an editable starting point where possible so that a correction does not depend on reconstructing a previous version from a flattened image or remembering how it used to look.</p>
+          <h2>8. Review meaning before geometry</h2>
+          <p>Perform two passes. First, identify the source for every displayed person and connection. Second, read each card and check that its relevant content is represented or deliberately omitted with an explanation. These passes address different errors: a diagram can add an unsupported connection while simultaneously losing a qualification that was explicit in the source.</p>
+          <p>Only then make spacing, crossings and alignment the main concern. Follow representative lines to their endpoints at the intended reading size. Move elements to clarify the existing assertion without changing its meaning. Automatic layout may reduce arrangement effort, but it cannot determine whether Card C identifies the same person or whether a caregiving statement establishes a parent connection.</p>
+          <h2>9. Try a proposed comprehension check</h2>
+          <p>Ask another reader to identify the parent connection, the one-term caregiving role and the unresolved identity question without narrating the intended answers first. If the interpretation differs, revise the labels or key. This is a suggested teaching activity, not a claim that a participant study has already occurred or that a particular educational outcome has been measured.</p>
+          <p>Record the kind of misunderstanding rather than collecting an unnecessary personal story. Perhaps a dashed line was read as uncertainty, or an endpoint looked as though it belonged to another node. Those are representation problems to address. They do not justify inventing more facts, assigning a diagnosis or blaming a reader for a convention that was not explained clearly.</p>
+          <h2>10. Prepare the reading copy deliberately</h2>
+          <p>The working file may contain competing interpretations and questions that are unnecessary for the intended audience. Decide which material belongs in the reading copy according to its purpose. Removing an unnecessary narrative is compatible with transparency: a caption can still state that some information remains unspecified without reproducing every underlying note or alternative.</p>
+          <p>Open the actual exported file, not only the editing canvas. Check labels, line endpoints and the legend at the intended viewing size. Confirm that working notes were not included unintentionally. If the whole map is too dense, prepare a focused view and state its omissions rather than shrinking every label until readers can no longer distinguish the connections.</p>
+          <h2>11. Attach context that survives forwarding</h2>
+          <p>Put a short purpose statement, fictional-example label, reference point and revision identifier inside the document. A filename alone may be changed or lost during forwarding. The caption should help a reader understand what the image is for and what it leaves unresolved, without pretending that it contains a complete account of a family or a clinical assessment.</p>
+          <p>Review the accompanying message and folder name as well as the image. Information removed from a diagram can still be disclosed by the surrounding presentation. This static workbook itself has no input form, client-side script or storage feature. Its hosting service and linked websites have their own network behavior and policies; that limited file design is not a broader confidentiality certification.</p>
+          <h2>12. Record decisions without inventing a score</h2>
+          <p>On a separate review sheet, give each proposed assertion a plain decision: supported for this exercise, revise the representation, or unresolved. Card A can support the stated parent connection. Card B supports the bounded caregiving role with its time qualification. Card C remains an identity question. Do not average these decisions into a family score or convert the number of unresolved items into a judgment about anyone's health or reliability.</p>
+          <p>For each unresolved item, record the next appropriate action and who needs to consider it, without inventing a deadline or promising an answer. A teacher might clarify an intentionally ambiguous fictional card; a real-world setting may require a different authorized process. If no clarification is available, retain the limitation in the reading copy. The review record should explain a decision, not pressure someone to supply sensitive information merely to close a checklist.</p>
+          <h2>13. Leave a correction route open</h2>
+          <p>Provide a practical way for a reader to question or remove a detail. When a revision is justified, identify the source behind the change and the earlier copy it supersedes. If clarification has not arrived, an unresolved item is a legitimate review outcome. A clean arrangement is not more valuable than an honest explanation of what remains unknown.</p>
+          <p>Be realistic about withdrawal: removing a hosted file or replacing a link does not guarantee that downloaded images disappear. Genograms do not diagnose conditions, establish inheritance patterns or predict an individual's future health. Those interpretations require qualified professionals and relevant evidence. The narrower result sought here is a readable, traceable and revisable teaching example, not an unquestionable family record.</p>
+          </main><footer>Project-affiliated educational material · Fictional examples · Autonomous AI assistance disclosed · No clinical or outcome claims.</footer></body></html>
+          GENOGRAM_REVIEW_HTML
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload only the independently reviewed generated document
+          path: 'generated_site'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
